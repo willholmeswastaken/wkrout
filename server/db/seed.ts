@@ -25,35 +25,33 @@ async function main() {
 
   // Insert exercises and get their IDs
   const insertedExercises = await db
-    .insert(schema.exercises)
+    .insert(schema.exercises as any)
     .values(exercises)
     .onConflictDoNothing()
-    .returning({ id: schema.exercises.id, name: schema.exercises.name });
+    .returning() as { id: number; name: string }[];
 
   // Seed workout plan
   const [plan] = await db
-    .insert(schema.workoutPlans)
+    .insert(schema.workoutPlans as any)
     .values({
       name: "Push Pull Legs",
       description: "Classic PPL split",
       isPredefined: true,
+      days: 3,
     })
     .onConflictDoNothing()
-    .returning({ id: schema.workoutPlans.id });
+    .returning() as { id: number }[];
 
   // Seed workout plan days
   const days = await db
-    .insert(schema.workoutPlanDays)
+    .insert(schema.workoutPlanDays as any)
     .values([
       { workoutPlanId: plan.id, name: "Push Strength", dayOrder: 1 },
       { workoutPlanId: plan.id, name: "Pull Strength", dayOrder: 2 },
       { workoutPlanId: plan.id, name: "Legs", dayOrder: 3 },
     ])
     .onConflictDoNothing()
-    .returning({
-      id: schema.workoutPlanDays.id,
-      dayOrder: schema.workoutPlanDays.dayOrder,
-    });
+    .returning() as { id: number; dayOrder: number }[];
 
   // Helper to get exercise ID by name
   const getExerciseId = (name: string) => {
@@ -63,7 +61,7 @@ async function main() {
   };
 
   // Seed workout plan exercises
-  await db.insert(schema.workoutPlanExercises).values([
+  await db.insert(schema.workoutPlanExercises as any).values([
     // Push Day
     {
       workoutPlanId: plan.id,
@@ -133,7 +131,7 @@ async function main() {
   console.log("Seeding complete!");
 }
 
-main().catch((e) => {
+main().catch((e: unknown) => {
   console.error(e);
   process.exit(1);
 });

@@ -1,0 +1,1 @@
+ALTER TABLE "workout_plans" ALTER COLUMN "days" SET DATA TYPE integer;

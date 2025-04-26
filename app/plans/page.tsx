@@ -1,9 +1,11 @@
-import { Button } from "@/components/ui/button"
-import Link from "next/link"
-import { ArrowLeft, Plus } from "lucide-react"
-import { WorkoutPlansList } from "@/components/workout-plans-list"
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
+import { ArrowLeft, Plus } from "lucide-react";
+import { WorkoutPlansList } from "@/components/workout-plans-list";
+import { api } from "@/trpc/server";
 
-export default function PlansPage() {
+export default async function PlansPage() {
+  const workoutPlans = await api.workout.getWorkoutPlans();
   return (
     <main className="container mx-auto px-4 py-8">
       <div className="max-w-7xl mx-auto">
@@ -28,5 +30,5 @@ export default function PlansPage() {
         </div>
       </div>
     </main>
-  )
+  );
 }

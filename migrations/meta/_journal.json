@@ -36,6 +36,20 @@
       "when": 1745687413363,
       "tag": "0004_bitter_next_avengers",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1745688199631,
+      "tag": "0005_absurd_wonder_man",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1745688378894,
+      "tag": "0006_productive_junta",
+      "breakpoints": true
     }
   ]
 }

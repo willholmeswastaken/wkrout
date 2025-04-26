@@ -11,6 +11,7 @@ import {
   unique,
   numeric,
 } from "drizzle-orm/pg-core";
+import { relations } from "drizzle-orm";
 
 export const users = pgTable(
   "users",
@@ -43,6 +44,7 @@ export const workoutPlans = pgTable("workout_plans", {
   isPredefined: boolean("is_predefined").default(false).notNull(),
   description: text("description"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
+  days: integer("days").notNull().default(0),
 });
 
 // Workout plan days table (named days for plans)
@@ -58,7 +60,10 @@ export const workoutPlanDays = pgTable(
   },
   (table) => [
     index("workout_plan_days_plan_id_idx").on(table.workoutPlanId),
-    unique("workout_plan_days_unique_idx").on(table.workoutPlanId, table.dayOrder),
+    unique("workout_plan_days_unique_idx").on(
+      table.workoutPlanId,
+      table.dayOrder
+    ),
   ]
 );
 
@@ -168,3 +173,80 @@ export const userWorkoutSets = pgTable(
     ),
   ]
 );
+
+export const usersRelations = relations(users, (rel) => ({
+  userWorkoutPlans: rel.many(userWorkoutPlans),
+  userWorkouts: rel.many(userWorkouts),
+}));
+
+export const exercisesRelations = relations(exercises, (rel) => ({
+  workoutPlanExercises: rel.many(workoutPlanExercises),
+  userWorkoutSets: rel.many(userWorkoutSets),
+}));
+
+export const workoutPlansRelations = relations(workoutPlans, (rel) => ({
+  workoutPlanDays: rel.many(workoutPlanDays),
+  workoutPlanExercises: rel.many(workoutPlanExercises),
+  userWorkoutPlans: rel.many(userWorkoutPlans),
+}));
+
+export const workoutPlanDaysRelations = relations(workoutPlanDays, (rel) => ({
+  workoutPlan: rel.one(workoutPlans, {
+    fields: [workoutPlanDays.workoutPlanId],
+    references: [workoutPlans.id],
+  }),
+  workoutPlanExercises: rel.many(workoutPlanExercises),
+}));
+
+export const workoutPlanExercisesRelations = relations(
+  workoutPlanExercises,
+  (rel) => ({
+    workoutPlan: rel.one(workoutPlans, {
+      fields: [workoutPlanExercises.workoutPlanId],
+      references: [workoutPlans.id],
+    }),
+    exercise: rel.one(exercises, {
+      fields: [workoutPlanExercises.exerciseId],
+      references: [exercises.id],
+    }),
+    workoutPlanDay: rel.one(workoutPlanDays, {
+      fields: [workoutPlanExercises.workoutPlanDayId],
+      references: [workoutPlanDays.id],
+    }),
+  })
+);
+
+export const userWorkoutPlansRelations = relations(userWorkoutPlans, (rel) => ({
+  user: rel.one(users, {
+    fields: [userWorkoutPlans.userId],
+    references: [users.id],
+  }),
+  workoutPlan: rel.one(workoutPlans, {
+    fields: [userWorkoutPlans.workoutPlanId],
+    references: [workoutPlans.id],
+  }),
+  userWorkouts: rel.many(userWorkouts),
+}));
+
+export const userWorkoutsRelations = relations(userWorkouts, (rel) => ({
+  user: rel.one(users, {
+    fields: [userWorkouts.userId],
+    references: [users.id],
+  }),
+  userWorkoutPlan: rel.one(userWorkoutPlans, {
+    fields: [userWorkouts.userWorkoutPlanId],
+    references: [userWorkoutPlans.id],
+  }),
+  userWorkoutSets: rel.many(userWorkoutSets),
+}));
+
+export const userWorkoutSetsRelations = relations(userWorkoutSets, (rel) => ({
+  userWorkout: rel.one(userWorkouts, {
+    fields: [userWorkoutSets.userWorkoutId],
+    references: [userWorkouts.id],
+  }),
+  exercise: rel.one(exercises, {
+    fields: [userWorkoutSets.exerciseId],
+    references: [exercises.id],
+  }),
+}));
