@@ -1,9 +1,16 @@
-"use client"
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Progress } from "@/components/ui/progress"
+"use client";
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
 import {
   Dialog,
   DialogContent,
@@ -11,10 +18,17 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog"
-import { Alert, AlertDescription } from "@/components/ui/alert"
-import Link from "next/link"
-import { Play, Calendar, ChevronRight, CheckCircle, RotateCcw, AlertTriangle } from "lucide-react"
+} from "@/components/ui/dialog";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import Link from "next/link";
+import {
+  Play,
+  Calendar,
+  ChevronRight,
+  CheckCircle,
+  RotateCcw,
+  AlertTriangle,
+} from "lucide-react";
 
 // Mock data for the current plan
 const INITIAL_PLAN_DATA = {
@@ -76,12 +90,12 @@ const INITIAL_PLAN_DATA = {
       rating: 5,
     },
   ],
-}
+};
 
 export function CurrentPlanOverview() {
-  const [currentPlan, setCurrentPlan] = useState(INITIAL_PLAN_DATA)
-  const [showResetDialog, setShowResetDialog] = useState(false)
-  const [resetSuccess, setResetSuccess] = useState(false)
+  const [currentPlan, setCurrentPlan] = useState(INITIAL_PLAN_DATA);
+  const [showResetDialog, setShowResetDialog] = useState(false);
+  const [resetSuccess, setResetSuccess] = useState(false);
 
   const handleReset = () => {
     // Reset the current plan's progress
@@ -92,23 +106,36 @@ export function CurrentPlanOverview() {
         total: currentPlan.progress.total,
         percentage: 0,
       },
-      weekWorkouts: currentPlan.weekWorkouts.map((workout) => ({
-        ...workout,
-        completed: false,
-        isNext: workout.day === "1", // Set the first workout as next
-      })),
+      weekWorkouts: currentPlan.weekWorkouts.map((workout) => {
+        if (workout.day === "1") {
+          // This is the "next" workout, so remove `date` and set `isNext`
+          const { date, ...rest } = workout;
+          return {
+            ...rest,
+            completed: false,
+            isNext: true,
+          };
+        } else {
+          // All others, remove `isNext` and `date`
+          const { isNext, date, ...rest } = workout;
+          return {
+            ...rest,
+            completed: false,
+          };
+        }
+      }),
       // Keep recent workouts history
-    }
+    };
 
-    setCurrentPlan(resetPlan)
-    setShowResetDialog(false)
-    setResetSuccess(true)
+    setCurrentPlan(resetPlan);
+    setShowResetDialog(false);
+    setResetSuccess(true);
 
     // Hide success message after 3 seconds
     setTimeout(() => {
-      setResetSuccess(false)
-    }, 3000)
-  }
+      setResetSuccess(false);
+    }, 3000);
+  };
 
   return (
     <>
@@ -120,8 +147,12 @@ export function CurrentPlanOverview() {
               <CardDescription>Current Plan</CardDescription>
             </div>
             <div className="flex items-center gap-2">
-              <Badge variant="outline" className="bg-orange-500/10 text-orange-500 border-orange-500/20">
-                {currentPlan.progress.completed}/{currentPlan.progress.total} completed
+              <Badge
+                variant="outline"
+                className="bg-orange-500/10 text-orange-500 border-orange-500/20"
+              >
+                {currentPlan.progress.completed}/{currentPlan.progress.total}{" "}
+                completed
               </Badge>
               <Button
                 variant="outline"
@@ -151,9 +182,14 @@ export function CurrentPlanOverview() {
             <div className="space-y-1">
               <div className="flex justify-between text-xs">
                 <span className="text-muted-foreground">Weekly progress</span>
-                <span className="font-medium">{currentPlan.progress.percentage}%</span>
+                <span className="font-medium">
+                  {currentPlan.progress.percentage}%
+                </span>
               </div>
-              <Progress value={currentPlan.progress.percentage} className="h-2" />
+              <Progress
+                value={currentPlan.progress.percentage}
+                className="h-2"
+              />
             </div>
 
             {/* This week's workouts */}
@@ -167,8 +203,8 @@ export function CurrentPlanOverview() {
                       workout.completed
                         ? "bg-secondary/30"
                         : workout.isNext
-                          ? "bg-orange-500/10 border border-orange-500/20"
-                          : "bg-secondary/50"
+                        ? "bg-orange-500/10 border border-orange-500/20"
+                        : "bg-secondary/50"
                     }`}
                   >
                     <div className="flex justify-between items-center mb-2">
@@ -187,21 +223,28 @@ export function CurrentPlanOverview() {
                       </div>
                       {workout.completed && (
                         <span className="text-xs text-muted-foreground">
-                          {new Date(workout.date).toLocaleDateString()}
+                          {workout.date &&
+                            new Date(workout.date).toLocaleDateString("en-GB")}
                         </span>
                       )}
                     </div>
 
                     {!workout.completed && (
-                      <Link href={`/workout/start/${currentPlan.id}/${workout.day}`}>
+                      <Link
+                        href={`/workout/start/${currentPlan.id}/${workout.day}`}
+                      >
                         <Button
                           className={`w-full ${
-                            workout.isNext ? "bg-orange-500 hover:bg-orange-600" : "bg-secondary hover:bg-secondary/80"
+                            workout.isNext
+                              ? "bg-orange-500 hover:bg-orange-600"
+                              : "bg-secondary hover:bg-secondary/80"
                           }`}
                           size="sm"
                         >
                           <Play className="mr-2 h-3 w-3" />
-                          {workout.isNext ? "Start Next Workout" : "Start Workout"}
+                          {workout.isNext
+                            ? "Start Next Workout"
+                            : "Start Workout"}
                         </Button>
                       </Link>
                     )}
@@ -214,17 +257,25 @@ export function CurrentPlanOverview() {
             <div>
               <div className="flex justify-between items-center mb-2">
                 <h3 className="text-sm font-medium">Recent Workouts</h3>
-                <Link href="/history" className="text-xs text-orange-500 flex items-center">
+                <Link
+                  href="/history"
+                  className="text-xs text-orange-500 flex items-center"
+                >
                   View All
                   <ChevronRight className="h-3 w-3 ml-1" />
                 </Link>
               </div>
               <div className="space-y-2">
                 {currentPlan.recentWorkouts.map((workout) => (
-                  <div key={workout.id} className="flex justify-between items-center p-3 bg-secondary/30 rounded-md">
+                  <div
+                    key={workout.id}
+                    className="flex justify-between items-center p-3 bg-secondary/30 rounded-md"
+                  >
                     <div>
                       <div className="text-sm">{workout.name}</div>
-                      <div className="text-xs text-muted-foreground">{new Date(workout.date).toLocaleDateString()}</div>
+                      <div className="text-xs text-muted-foreground">
+                        {new Date(workout.date).toLocaleDateString("en-GB")}
+                      </div>
                     </div>
                     <div className="flex text-orange-500">
                       {Array(workout.rating)
@@ -255,15 +306,16 @@ export function CurrentPlanOverview() {
           <DialogHeader>
             <DialogTitle>Reset Weekly Progress</DialogTitle>
             <DialogDescription>
-              Are you sure you want to reset your weekly workout progress? This will mark all workouts as incomplete.
+              Are you sure you want to reset your weekly workout progress? This
+              will mark all workouts as incomplete.
             </DialogDescription>
           </DialogHeader>
 
           <div className="bg-orange-500/10 border border-orange-500/20 rounded-md p-3 flex items-start gap-2">
             <AlertTriangle className="h-5 w-5 text-orange-500 mt-0.5 flex-shrink-0" />
             <div className="text-sm">
-              This action cannot be undone. Your workout history will be preserved, but your current week's progress
-              will be reset.
+              This action cannot be undone. Your workout history will be
+              preserved, but your current week's progress will be reset.
             </div>
           </div>
 
@@ -278,5 +330,5 @@ export function CurrentPlanOverview() {
         </DialogContent>
       </Dialog>
     </>
-  )
+  );
 }

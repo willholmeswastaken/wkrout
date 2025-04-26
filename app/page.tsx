@@ -1,9 +1,21 @@
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import Link from "next/link"
-import { Dumbbell, Plus, Calendar, BarChart3, Settings, Flame } from "lucide-react"
-import { CurrentPlanOverview } from "@/components/current-plan-overview"
-import { WorkoutConsistencyGraph } from "@/components/workout-consistency-graph"
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import Link from "next/link";
+import {
+  Dumbbell,
+  Plus,
+  Calendar,
+  BarChart3,
+  Settings,
+  Flame,
+} from "lucide-react";
+import { CurrentPlanOverview } from "@/components/current-plan-overview";
 
 export default function Home() {
   // Mock data for weekly streak
@@ -23,7 +35,7 @@ export default function Home() {
       { active: false, date: "Feb 23-29" },
       { active: false, date: "Feb 16-22" },
     ],
-  }
+  };
 
   return (
     <main className="container mx-auto px-4 py-8">
@@ -31,7 +43,7 @@ export default function Home() {
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center">
             <Dumbbell className="h-6 w-6 text-orange-500 mr-2" />
-            <h1 className="text-2xl font-bold">Lift Tracker</h1>
+            <h1 className="text-2xl font-bold">Wrkout</h1>
           </div>
           <Link href="/settings">
             <Button variant="ghost" size="icon">
@@ -44,11 +56,6 @@ export default function Home() {
           {/* Current Plan Overview - Takes 2/3 of the screen on desktop */}
           <div className="lg:col-span-2">
             <CurrentPlanOverview />
-
-            {/* Workout Consistency Graph */}
-            <div className="mt-6">
-              <WorkoutConsistencyGraph />
-            </div>
           </div>
 
           {/* Quick Actions - Takes 1/3 of the screen on desktop */}
@@ -96,10 +103,14 @@ export default function Home() {
                   <CardTitle className="text-base">Weekly Streak</CardTitle>
                   <div className="flex items-center">
                     <Flame className="h-4 w-4 text-orange-500 mr-1" />
-                    <span className="text-lg font-bold text-orange-500">{weeklyStreak.current}</span>
+                    <span className="text-lg font-bold text-orange-500">
+                      {weeklyStreak.current}
+                    </span>
                   </div>
                 </div>
-                <CardDescription>Consecutive weeks with workouts</CardDescription>
+                <CardDescription>
+                  Consecutive weeks with workouts
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
@@ -108,7 +119,9 @@ export default function Home() {
                     {weeklyStreak.weeks.map((week, index) => (
                       <div
                         key={index}
-                        className={`h-2 flex-1 rounded-full ${week.active ? "bg-orange-500" : "bg-gray-700"}`}
+                        className={`h-2 flex-1 rounded-full ${
+                          week.active ? "bg-orange-500" : "bg-gray-700"
+                        }`}
                         title={week.date}
                       />
                     ))}
@@ -121,12 +134,19 @@ export default function Home() {
 
                   <div className="pt-2 flex justify-between items-center">
                     <div>
-                      <div className="text-xs text-muted-foreground">Best streak</div>
-                      <div className="font-semibold">{weeklyStreak.best} weeks</div>
+                      <div className="text-xs text-muted-foreground">
+                        Best streak
+                      </div>
+                      <div className="font-semibold">
+                        {weeklyStreak.best} weeks
+                      </div>
                     </div>
 
                     <Link href="/plans/create">
-                      <Button size="sm" className="bg-orange-500 hover:bg-orange-600">
+                      <Button
+                        size="sm"
+                        className="bg-orange-500 hover:bg-orange-600"
+                      >
                         <Plus className="h-4 w-4 mr-1" />
                         New Plan
                       </Button>
@@ -139,5 +159,5 @@ export default function Home() {
         </div>
       </div>
     </main>
-  )
+  );
 }
