@@ -1,0 +1,34 @@
+# dependencies
+node_modules/
+
+# production
+.next/
+
+# testing
+coverage/
+
+# environment variables
+.env*
+!.env.example
+
+# logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# local next.js build output
+out/
+
+# vercel
+.vercel/
+
+# next.js cache
+.next/cache/
+
+# misc
+*.local
