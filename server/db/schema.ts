@@ -45,7 +45,24 @@ export const workoutPlans = pgTable("workout_plans", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
-// Workout plan exercises (many-to-many, with day and order)
+// Workout plan days table (named days for plans)
+export const workoutPlanDays = pgTable(
+  "workout_plan_days",
+  {
+    id: serial("id").primaryKey(),
+    workoutPlanId: integer("workout_plan_id")
+      .notNull()
+      .references(() => workoutPlans.id),
+    name: varchar("name", { length: 100 }).notNull(), // e.g. "Push Strength"
+    dayOrder: integer("day_order").notNull(), // 1 = first day, 2 = second day, etc.
+  },
+  (table) => [
+    index("workout_plan_days_plan_id_idx").on(table.workoutPlanId),
+    unique("workout_plan_days_unique_idx").on(table.workoutPlanId, table.dayOrder),
+  ]
+);
+
+// Workout plan exercises (many-to-many, with named day and order)
 export const workoutPlanExercises = pgTable(
   "workout_plan_exercises",
   {
@@ -56,16 +73,19 @@ export const workoutPlanExercises = pgTable(
     exerciseId: integer("exercise_id")
       .notNull()
       .references(() => exercises.id),
-    day: integer("day").notNull(), // e.g. 1 = Monday, 2 = Tuesday, etc.
+    workoutPlanDayId: integer("workout_plan_day_id")
+      .notNull()
+      .references(() => workoutPlanDays.id),
     orderInDay: integer("order_in_day").notNull(),
   },
   (table) => [
     index("workout_plan_id_idx").on(table.workoutPlanId),
     index("exercise_id_idx").on(table.exerciseId),
+    index("workout_plan_day_id_idx").on(table.workoutPlanDayId),
     unique("workout_plan_exercises_unique_idx").on(
       table.workoutPlanId,
       table.exerciseId,
-      table.day,
+      table.workoutPlanDayId,
       table.orderInDay
     ),
   ]
