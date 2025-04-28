@@ -50,6 +50,13 @@
       "when": 1745688378894,
       "tag": "0006_productive_junta",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1745861833842,
+      "tag": "0007_complete_nova",
+      "breakpoints": true
     }
   ]
 }
