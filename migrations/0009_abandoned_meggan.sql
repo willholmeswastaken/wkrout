@@ -1,0 +1,1 @@
+ALTER TABLE "workout_plan_exercise_sets" DROP COLUMN "weight";

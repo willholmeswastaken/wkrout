@@ -86,12 +86,27 @@ export const workoutPlanExercises = pgTable(
   (table) => [
     index("workout_plan_id_idx").on(table.workoutPlanId),
     index("exercise_id_idx").on(table.exerciseId),
-    index("workout_plan_day_id_idx").on(table.workoutPlanDayId),
-    unique("workout_plan_exercises_unique_idx").on(
-      table.workoutPlanId,
-      table.exerciseId,
-      table.workoutPlanDayId,
-      table.orderInDay
+  ]
+);
+
+// Sets for each workout plan exercise (template-level)
+export const workoutPlanExerciseSets = pgTable(
+  "workout_plan_exercise_sets",
+  {
+    id: serial("id").primaryKey(),
+    workoutPlanExerciseId: integer("workout_plan_exercise_id")
+      .notNull()
+      .references(() => workoutPlanExercises.id, { onDelete: "cascade" }),
+    set: integer("set_number").notNull(), // 1, 2, 3, ...
+    reps: integer("reps").notNull(),
+  },
+  (table) => [
+    index("workout_plan_exercise_sets_exercise_id_idx").on(
+      table.workoutPlanExerciseId
+    ),
+    unique("workout_plan_exercise_sets_unique_idx").on(
+      table.workoutPlanExerciseId,
+      table.set
     ),
   ]
 );
@@ -155,14 +170,18 @@ export const userWorkoutExercises = pgTable(
     userWorkoutId: integer("user_workout_id")
       .notNull()
       .references(() => userWorkouts.id, { onDelete: "cascade" }),
-    workoutPlanExerciseId: integer("workout_plan_exercise_id").references(() => workoutPlanExercises.id),
+    workoutPlanExerciseId: integer("workout_plan_exercise_id").references(
+      () => workoutPlanExercises.id
+    ),
     exerciseId: integer("exercise_id")
       .notNull()
       .references(() => exercises.id),
   },
   (table) => [
     index("user_workout_exercises_user_workout_id_idx").on(table.userWorkoutId),
-    index("user_workout_exercises_workout_plan_exercise_id_idx").on(table.workoutPlanExerciseId),
+    index("user_workout_exercises_workout_plan_exercise_id_idx").on(
+      table.workoutPlanExerciseId
+    ),
   ]
 );
 
@@ -180,7 +199,9 @@ export const userWorkoutSets = pgTable(
     createdAt: timestamp("created_at").defaultNow().notNull(),
   },
   (table) => [
-    index("user_workout_sets_user_workout_exercise_id_idx").on(table.userWorkoutExerciseId),
+    index("user_workout_sets_user_workout_exercise_id_idx").on(
+      table.userWorkoutExerciseId
+    ),
     unique("user_workout_sets_unique_idx").on(
       table.userWorkoutExerciseId,
       table.setNumber
@@ -226,6 +247,17 @@ export const workoutPlanExercisesRelations = relations(
       fields: [workoutPlanExercises.workoutPlanDayId],
       references: [workoutPlanDays.id],
     }),
+    sets: rel.many(workoutPlanExerciseSets),
+  })
+);
+
+export const workoutPlanExerciseSetsRelations = relations(
+  workoutPlanExerciseSets,
+  (rel) => ({
+    workoutPlanExercise: rel.one(workoutPlanExercises, {
+      fields: [workoutPlanExerciseSets.workoutPlanExerciseId],
+      references: [workoutPlanExercises.id],
+    }),
   })
 );
 
@@ -253,20 +285,23 @@ export const userWorkoutsRelations = relations(userWorkouts, (rel) => ({
   userWorkoutExercises: rel.many(userWorkoutExercises),
 }));
 
-export const userWorkoutExercisesRelations = relations(userWorkoutExercises, (rel) => ({
-  userWorkout: rel.one(userWorkouts, {
-    fields: [userWorkoutExercises.userWorkoutId],
-    references: [userWorkouts.id],
-  }),
-  workoutPlanExercise: rel.one(workoutPlanExercises, {
-    fields: [userWorkoutExercises.workoutPlanExerciseId],
-    references: [workoutPlanExercises.id],
-  }),
-  exercise: rel.one(exercises, {
-    fields: [userWorkoutExercises.exerciseId],
-    references: [exercises.id],
-  }),
-}));
+export const userWorkoutExercisesRelations = relations(
+  userWorkoutExercises,
+  (rel) => ({
+    userWorkout: rel.one(userWorkouts, {
+      fields: [userWorkoutExercises.userWorkoutId],
+      references: [userWorkouts.id],
+    }),
+    workoutPlanExercise: rel.one(workoutPlanExercises, {
+      fields: [userWorkoutExercises.workoutPlanExerciseId],
+      references: [workoutPlanExercises.id],
+    }),
+    exercise: rel.one(exercises, {
+      fields: [userWorkoutExercises.exerciseId],
+      references: [exercises.id],
+    }),
+  })
+);
 
 export const userWorkoutSetsRelations = relations(userWorkoutSets, (rel) => ({
   userWorkoutExercise: rel.one(userWorkoutExercises, {

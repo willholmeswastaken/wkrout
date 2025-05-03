@@ -9,6 +9,7 @@ export const workoutRouter = createTRPCRouter({
             workoutPlanExercises: {
               with: {
                 exercise: true,
+                sets: true,
               },
             },
           },
