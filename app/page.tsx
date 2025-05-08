@@ -14,10 +14,16 @@ import {
   BarChart3,
   Settings,
   Flame,
+  CheckCircle,
 } from "lucide-react";
 import { CurrentPlanOverview } from "@/components/current-plan-overview";
+import { api } from "@/trpc/server";
 
-export default function Home() {
+export default async function Home() {
+  // Fetch user's current plan
+  const userPlans = await api.user.getUserWorkoutPlans();
+  const hasActivePlan = userPlans.length > 0;
+
   // Mock data for weekly streak
   const weeklyStreak = {
     current: 8, // Current streak in weeks
@@ -38,126 +44,185 @@ export default function Home() {
   };
 
   return (
-    <main className="container mx-auto px-4 py-8">
-      <div className="max-w-7xl mx-auto">
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center">
-            <Dumbbell className="h-6 w-6 text-orange-500 mr-2" />
-            <h1 className="text-2xl font-bold">Wrkout</h1>
-          </div>
-          <Link href="/settings">
-            <Button variant="ghost" size="icon">
-              <Settings className="h-5 w-5" />
-            </Button>
-          </Link>
-        </div>
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      {/* Current Plan Overview - Takes 2/3 of the screen on desktop */}
+      <div className="lg:col-span-2">
+        {hasActivePlan ? (
+          <CurrentPlanOverview plan={userPlans[0]} />
+        ) : (
+          <div className="space-y-6">
+            <div>
+              <div className="flex items-center gap-2 mb-6">
+                <div>
+                  <h2 className="text-2xl font-bold">No Active Plan</h2>
+                  <p className="text-muted-foreground">
+                    Start your fitness journey today
+                  </p>
+                </div>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <Card className="bg-orange-500/5 border-orange-500/20">
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-base">
+                      Predefined Plans
+                    </CardTitle>
+                    <CardDescription>
+                      Choose from our curated workout plans
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <Link href="/plans">
+                      <Button className="w-full bg-orange-500 hover:bg-orange-600">
+                        <Calendar className="mr-2 h-4 w-4" />
+                        Browse Plans
+                      </Button>
+                    </Link>
+                  </CardContent>
+                </Card>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Current Plan Overview - Takes 2/3 of the screen on desktop */}
-          <div className="lg:col-span-2">
-            <CurrentPlanOverview />
-          </div>
-
-          {/* Quick Actions - Takes 1/3 of the screen on desktop */}
-          <div className="space-y-4">
-            <h2 className="text-lg font-semibold">Quick Actions</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-4">
-              <Card>
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-base">My Plans</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <Link href="/plans">
-                    <Button
-                      variant="outline"
-                      className="w-full border-orange-500/20 hover:bg-orange-500/10 hover:text-orange-500"
-                    >
-                      <Calendar className="mr-2 h-4 w-4 text-orange-500" />
-                      View Plans
-                    </Button>
-                  </Link>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-base">Progress</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <Link href="/progress">
-                    <Button
-                      variant="outline"
-                      className="w-full border-orange-500/20 hover:bg-orange-500/10 hover:text-orange-500"
-                    >
-                      <BarChart3 className="mr-2 h-4 w-4 text-orange-500" />
-                      Analytics
-                    </Button>
-                  </Link>
-                </CardContent>
-              </Card>
+                <Card className="bg-secondary/50">
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-base">Custom Plan</CardTitle>
+                    <CardDescription>
+                      Create your own workout routine
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <Link href="/plans/create">
+                      <Button
+                        variant="outline"
+                        className="w-full border-orange-500/20 hover:bg-orange-500/10 hover:text-orange-500"
+                      >
+                        <Plus className="mr-2 h-4 w-4" />
+                        Create Custom
+                      </Button>
+                    </Link>
+                  </CardContent>
+                </Card>
+              </div>
             </div>
 
             <Card>
               <CardHeader className="pb-2">
-                <div className="flex justify-between items-center">
-                  <CardTitle className="text-base">Weekly Streak</CardTitle>
-                  <div className="flex items-center">
-                    <Flame className="h-4 w-4 text-orange-500 mr-1" />
-                    <span className="text-lg font-bold text-orange-500">
-                      {weeklyStreak.current}
-                    </span>
-                  </div>
-                </div>
-                <CardDescription>
-                  Consecutive weeks with workouts
-                </CardDescription>
+                <CardTitle className="text-base">
+                  Why Choose a Predefined Plan?
+                </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="space-y-3">
-                  {/* Streak visualization */}
-                  <div className="flex gap-1">
-                    {weeklyStreak.weeks.map((week, index) => (
-                      <div
-                        key={index}
-                        className={`h-2 flex-1 rounded-full ${
-                          week.active ? "bg-orange-500" : "bg-gray-700"
-                        }`}
-                        title={week.date}
-                      />
-                    ))}
-                  </div>
-
-                  <div className="flex justify-between text-xs text-muted-foreground">
-                    <span>10 weeks ago</span>
-                    <span>Current</span>
-                  </div>
-
-                  <div className="pt-2 flex justify-between items-center">
-                    <div>
-                      <div className="text-xs text-muted-foreground">
-                        Best streak
-                      </div>
-                      <div className="font-semibold">
-                        {weeklyStreak.best} weeks
-                      </div>
-                    </div>
-
-                    <Link href="/plans/create">
-                      <Button
-                        size="sm"
-                        className="bg-orange-500 hover:bg-orange-600"
-                      >
-                        <Plus className="h-4 w-4 mr-1" />
-                        New Plan
-                      </Button>
-                    </Link>
-                  </div>
-                </div>
+                <ul className="space-y-2 text-sm text-muted-foreground">
+                  <li className="flex items-center gap-2">
+                    <CheckCircle className="h-4 w-4 text-orange-500" />
+                    Expert-designed workout routines
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <CheckCircle className="h-4 w-4 text-orange-500" />
+                    Progressive difficulty levels
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <CheckCircle className="h-4 w-4 text-orange-500" />
+                    Balanced exercise selection
+                  </li>
+                </ul>
               </CardContent>
             </Card>
           </div>
-        </div>
+        )}
       </div>
-    </main>
+
+      {/* Quick Actions - Takes 1/3 of the screen on desktop */}
+      <div className="space-y-4">
+        <h2 className="text-lg font-semibold">Quick Actions</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-4">
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-base">My Plans</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <Link href="/plans">
+                <Button
+                  variant="outline"
+                  className="w-full border-orange-500/20 hover:bg-orange-500/10 hover:text-orange-500"
+                >
+                  <Calendar className="mr-2 h-4 w-4 text-orange-500" />
+                  View Plans
+                </Button>
+              </Link>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-base">Progress</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <Link href="/progress">
+                <Button
+                  variant="outline"
+                  className="w-full border-orange-500/20 hover:bg-orange-500/10 hover:text-orange-500"
+                >
+                  <BarChart3 className="mr-2 h-4 w-4 text-orange-500" />
+                  Analytics
+                </Button>
+              </Link>
+            </CardContent>
+          </Card>
+        </div>
+
+        <Card>
+          <CardHeader className="pb-2">
+            <div className="flex justify-between items-center">
+              <CardTitle className="text-base">Weekly Streak</CardTitle>
+              <div className="flex items-center">
+                <Flame className="h-4 w-4 text-orange-500 mr-1" />
+                <span className="text-lg font-bold text-orange-500">
+                  {weeklyStreak.current}
+                </span>
+              </div>
+            </div>
+            <CardDescription>Consecutive weeks with workouts</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              {/* Streak visualization */}
+              <div className="flex gap-1">
+                {weeklyStreak.weeks.map((week, index) => (
+                  <div
+                    key={index}
+                    className={`h-2 flex-1 rounded-full ${
+                      week.active ? "bg-orange-500" : "bg-gray-700"
+                    }`}
+                    title={week.date}
+                  />
+                ))}
+              </div>
+
+              <div className="flex justify-between text-xs text-muted-foreground">
+                <span>10 weeks ago</span>
+                <span>Current</span>
+              </div>
+
+              <div className="pt-2 flex justify-between items-center">
+                <div>
+                  <div className="text-xs text-muted-foreground">
+                    Best streak
+                  </div>
+                  <div className="font-semibold">{weeklyStreak.best} weeks</div>
+                </div>
+
+                <Link href="/plans/create">
+                  <Button
+                    size="sm"
+                    className="bg-orange-500 hover:bg-orange-600"
+                  >
+                    <Plus className="h-4 w-4 mr-1" />
+                    New Plan
+                  </Button>
+                </Link>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
   );
 }

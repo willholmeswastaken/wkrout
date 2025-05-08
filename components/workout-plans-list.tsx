@@ -14,9 +14,9 @@ import { WorkoutPlansResponse } from "@/types/plans";
 
 export function WorkoutPlansList({ plans }: { plans: WorkoutPlansResponse }) {
   return (
-    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
+    <>
       {plans.map((plan) => (
-        <Card key={plan.id}>
+        <Card key={plan.id} className="min-w-[300px] w-full mx-auto">
           <CardHeader className="pb-2">
             <div className="flex justify-between items-center">
               <CardTitle>{plan.name}</CardTitle>
@@ -34,6 +34,6 @@ export function WorkoutPlansList({ plans }: { plans: WorkoutPlansResponse }) {
           </CardFooter>
         </Card>
       ))}
-    </div>
+    </>
   );
 }

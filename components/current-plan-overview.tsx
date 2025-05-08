@@ -30,104 +30,36 @@ import {
   AlertTriangle,
 } from "lucide-react";
 
-// Mock data for the current plan
-const INITIAL_PLAN_DATA = {
-  id: "1",
-  name: "5-Day Split",
-  progress: {
-    completed: 2,
-    total: 5,
-    percentage: 40,
-  },
-  weekWorkouts: [
-    {
-      id: "1",
-      day: "1",
-      name: "Day 1: Biceps & Chest",
-      completed: true,
-      date: "2025-04-15",
-    },
-    {
-      id: "2",
-      day: "2",
-      name: "Day 2: Back & Triceps",
-      completed: true,
-      date: "2025-04-13",
-    },
-    {
-      id: "3",
-      day: "3",
-      name: "Day 3: Shoulders",
-      completed: false,
-      isNext: true,
-    },
-    {
-      id: "4",
-      day: "4",
-      name: "Day 4: Legs",
-      completed: false,
-    },
-    {
-      id: "5",
-      day: "5",
-      name: "Day 5: Core & Cardio",
-      completed: false,
-    },
-  ],
-  recentWorkouts: [
-    {
-      id: "1",
-      day: "1",
-      name: "Day 1: Biceps & Chest",
-      date: "2025-04-15",
-      rating: 4,
-    },
-    {
-      id: "2",
-      day: "2",
-      name: "Day 2: Back & Triceps",
-      date: "2025-04-13",
-      rating: 5,
-    },
-  ],
+type UserWorkoutPlan = {
+  id: number;
+  workoutPlanId: number;
+  customName: string | null;
+  daysPerWeek: number;
+  workoutPlan: {
+    id: number;
+    name: string;
+    description: string | null;
+    days: number;
+  };
 };
 
-export function CurrentPlanOverview() {
-  const [currentPlan, setCurrentPlan] = useState(INITIAL_PLAN_DATA);
+interface CurrentPlanOverviewProps {
+  plan: UserWorkoutPlan;
+}
+
+export function CurrentPlanOverview({ plan }: CurrentPlanOverviewProps) {
   const [showResetDialog, setShowResetDialog] = useState(false);
   const [resetSuccess, setResetSuccess] = useState(false);
 
-  const handleReset = () => {
-    // Reset the current plan's progress
-    const resetPlan = {
-      ...currentPlan,
-      progress: {
-        completed: 0,
-        total: currentPlan.progress.total,
-        percentage: 0,
-      },
-      weekWorkouts: currentPlan.weekWorkouts.map((workout) => {
-        if (workout.day === "1") {
-          // This is the "next" workout, so remove `date` and set `isNext`
-          const { date, ...rest } = workout;
-          return {
-            ...rest,
-            completed: false,
-            isNext: true,
-          };
-        } else {
-          // All others, remove `isNext` and `date`
-          const { isNext, date, ...rest } = workout;
-          return {
-            ...rest,
-            completed: false,
-          };
-        }
-      }),
-      // Keep recent workouts history
-    };
+  const planName = plan.customName || plan.workoutPlan.name;
+  const totalWorkouts = plan.daysPerWeek;
+  const completedWorkouts = 0; // TODO: Calculate from userWorkouts
+  const progressPercentage = Math.round(
+    (completedWorkouts / totalWorkouts) * 100
+  );
 
-    setCurrentPlan(resetPlan);
+  const handleReset = () => {
+    // TODO: Implement reset functionality
     setShowResetDialog(false);
     setResetSuccess(true);
 
@@ -143,7 +75,7 @@ export function CurrentPlanOverview() {
         <CardHeader className="pb-2">
           <div className="flex justify-between items-center">
             <div>
-              <CardTitle>{currentPlan.name}</CardTitle>
+              <CardTitle>{planName}</CardTitle>
               <CardDescription>Current Plan</CardDescription>
             </div>
             <div className="flex items-center gap-2">
@@ -151,8 +83,7 @@ export function CurrentPlanOverview() {
                 variant="outline"
                 className="bg-orange-500/10 text-orange-500 border-orange-500/20"
               >
-                {currentPlan.progress.completed}/{currentPlan.progress.total}{" "}
-                completed
+                {completedWorkouts}/{totalWorkouts} completed
               </Badge>
               <Button
                 variant="outline"
@@ -182,110 +113,40 @@ export function CurrentPlanOverview() {
             <div className="space-y-1">
               <div className="flex justify-between text-xs">
                 <span className="text-muted-foreground">Weekly progress</span>
-                <span className="font-medium">
-                  {currentPlan.progress.percentage}%
-                </span>
+                <span className="font-medium">{progressPercentage}%</span>
               </div>
-              <Progress
-                value={currentPlan.progress.percentage}
-                className="h-2"
-              />
+              <Progress value={progressPercentage} className="h-2" />
             </div>
 
             {/* This week's workouts */}
             <div>
               <h3 className="text-sm font-medium mb-3">This Week's Workouts</h3>
               <div className="space-y-3">
-                {currentPlan.weekWorkouts.map((workout) => (
-                  <div
-                    key={workout.id}
-                    className={`rounded-lg p-3 ${
-                      workout.completed
-                        ? "bg-secondary/30"
-                        : workout.isNext
-                        ? "bg-orange-500/10 border border-orange-500/20"
-                        : "bg-secondary/50"
-                    }`}
-                  >
-                    <div className="flex justify-between items-center mb-2">
-                      <div className="flex items-center">
-                        {workout.completed ? (
-                          <CheckCircle className="h-4 w-4 text-orange-500 mr-2" />
-                        ) : (
-                          <Badge
-                            variant="outline"
-                            className="mr-2 bg-secondary/50 text-muted-foreground border-secondary"
-                          >
-                            Day {workout.day}
-                          </Badge>
-                        )}
-                        <h4 className="text-sm font-medium">{workout.name}</h4>
-                      </div>
-                      {workout.completed && (
-                        <span className="text-xs text-muted-foreground">
-                          {workout.date &&
-                            new Date(workout.date).toLocaleDateString("en-GB")}
-                        </span>
-                      )}
-                    </div>
-
-                    {!workout.completed && (
-                      <Link
-                        href={`/workout/start/${currentPlan.id}/${workout.day}`}
+                {/* TODO: Map through actual workout days */}
+                <div className="rounded-lg p-3 bg-orange-500/10 border border-orange-500/20">
+                  <div className="flex justify-between items-center mb-2">
+                    <div className="flex items-center">
+                      <Badge
+                        variant="outline"
+                        className="mr-2 bg-secondary/50 text-muted-foreground border-secondary"
                       >
-                        <Button
-                          className={`w-full ${
-                            workout.isNext
-                              ? "bg-orange-500 hover:bg-orange-600"
-                              : "bg-secondary hover:bg-secondary/80"
-                          }`}
-                          size="sm"
-                        >
-                          <Play className="mr-2 h-3 w-3" />
-                          {workout.isNext
-                            ? "Start Next Workout"
-                            : "Start Workout"}
-                        </Button>
-                      </Link>
-                    )}
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Recent workouts */}
-            <div>
-              <div className="flex justify-between items-center mb-2">
-                <h3 className="text-sm font-medium">Recent Workouts</h3>
-                <Link
-                  href="/history"
-                  className="text-xs text-orange-500 flex items-center"
-                >
-                  View All
-                  <ChevronRight className="h-3 w-3 ml-1" />
-                </Link>
-              </div>
-              <div className="space-y-2">
-                {currentPlan.recentWorkouts.map((workout) => (
-                  <div
-                    key={workout.id}
-                    className="flex justify-between items-center p-3 bg-secondary/30 rounded-md"
-                  >
-                    <div>
-                      <div className="text-sm">{workout.name}</div>
-                      <div className="text-xs text-muted-foreground">
-                        {new Date(workout.date).toLocaleDateString("en-GB")}
-                      </div>
-                    </div>
-                    <div className="flex text-orange-500">
-                      {Array(workout.rating)
-                        .fill(0)
-                        .map((_, i) => (
-                          <span key={i}>★</span>
-                        ))}
+                        Day 1
+                      </Badge>
+                      <h4 className="text-sm font-medium">
+                        Start your workout
+                      </h4>
                     </div>
                   </div>
-                ))}
+                  <Link href={`/workout/start/${plan.id}/1`}>
+                    <Button
+                      className="w-full bg-orange-500 hover:bg-orange-600"
+                      size="sm"
+                    >
+                      <Play className="mr-2 h-3 w-3" />
+                      Start Next Workout
+                    </Button>
+                  </Link>
+                </div>
               </div>
             </div>
           </div>
@@ -306,20 +167,11 @@ export function CurrentPlanOverview() {
           <DialogHeader>
             <DialogTitle>Reset Weekly Progress</DialogTitle>
             <DialogDescription>
-              Are you sure you want to reset your weekly workout progress? This
-              will mark all workouts as incomplete.
+              Are you sure you want to reset your weekly progress? This will
+              clear all completed workouts for the current week.
             </DialogDescription>
           </DialogHeader>
-
-          <div className="bg-orange-500/10 border border-orange-500/20 rounded-md p-3 flex items-start gap-2">
-            <AlertTriangle className="h-5 w-5 text-orange-500 mt-0.5 flex-shrink-0" />
-            <div className="text-sm">
-              This action cannot be undone. Your workout history will be
-              preserved, but your current week's progress will be reset.
-            </div>
-          </div>
-
-          <DialogFooter className="gap-2 sm:gap-0">
+          <DialogFooter>
             <Button variant="outline" onClick={() => setShowResetDialog(false)}>
               Cancel
             </Button>
