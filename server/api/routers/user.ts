@@ -1,5 +1,4 @@
-import { eq } from "drizzle-orm";
-import { createTRPCRouter, protectedProcedure, publicProcedure } from "../trpc";
+import { createTRPCRouter, protectedProcedure } from "../trpc";
 
 export const userRouter = createTRPCRouter({
   getUserWorkoutPlans: protectedProcedure.query(({ ctx }) => {
