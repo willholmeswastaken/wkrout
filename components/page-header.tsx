@@ -1,6 +1,6 @@
-import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { Dumbbell, Settings } from "lucide-react";
+import { Dumbbell } from "lucide-react";
+import { SignInButton } from "./sign-in";
 
 export function PageHeader() {
   return (
@@ -12,11 +12,7 @@ export function PageHeader() {
             Wrkout
           </h1>
         </Link>
-        <Link href="/settings">
-          <Button variant="ghost" size="icon">
-            <Settings className="h-5 w-5" />
-          </Button>
-        </Link>
+        <SignInButton />
       </div>
       <div className="border-b border-border mb-8" />
     </>

@@ -1,8 +1,11 @@
-import { createTRPCRouter, publicProcedure } from "../trpc";
+import { eq } from "drizzle-orm";
+import { createTRPCRouter, protectedProcedure, publicProcedure } from "../trpc";
 
 export const userRouter = createTRPCRouter({
-  getUserWorkoutPlans: publicProcedure.query(({ ctx }) => {
+  getUserWorkoutPlans: protectedProcedure.query(({ ctx }) => {
     const plans = ctx.db.query.userWorkoutPlans.findMany({
+      where: (userWorkoutPlans, { eq }) =>
+        eq(userWorkoutPlans.userId, ctx.session.user.id),
       with: {
         workoutPlan: true,
       },
