@@ -13,17 +13,59 @@ import {
 } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 
-export const users = pgTable(
-  "users",
+export const user = pgTable(
+  "user",
   {
-    id: serial("id").primaryKey(),
-    email: varchar("email", { length: 255 }).notNull().unique(),
-    name: varchar("name", { length: 255 }),
-    createdAt: timestamp("created_at").defaultNow().notNull(),
-    isSubscribed: boolean("is_subscribed").default(false).notNull(),
+    id: text("id").primaryKey(),
+    name: text("name").notNull(),
+    email: text("email").notNull().unique(),
+    emailVerified: boolean("email_verified").notNull(),
+    image: text("image"),
+    createdAt: timestamp("created_at").notNull(),
+    updatedAt: timestamp("updated_at").notNull(),
   },
   (table) => [index("email_idx").on(table.email)]
 );
+
+export const session = pgTable("session", {
+  id: text("id").primaryKey(),
+  expiresAt: timestamp("expires_at").notNull(),
+  token: text("token").notNull().unique(),
+  createdAt: timestamp("created_at").notNull(),
+  updatedAt: timestamp("updated_at").notNull(),
+  ipAddress: text("ip_address"),
+  userAgent: text("user_agent"),
+  userId: text("user_id")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
+});
+
+export const account = pgTable("account", {
+  id: text("id").primaryKey(),
+  accountId: text("account_id").notNull(),
+  providerId: text("provider_id").notNull(),
+  userId: text("user_id")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
+  accessToken: text("access_token"),
+  refreshToken: text("refresh_token"),
+  idToken: text("id_token"),
+  accessTokenExpiresAt: timestamp("access_token_expires_at"),
+  refreshTokenExpiresAt: timestamp("refresh_token_expires_at"),
+  scope: text("scope"),
+  password: text("password"),
+  createdAt: timestamp("created_at").notNull(),
+  updatedAt: timestamp("updated_at").notNull(),
+});
+
+export const verification = pgTable("verification", {
+  id: text("id").primaryKey(),
+  identifier: text("identifier").notNull(),
+  value: text("value").notNull(),
+  expiresAt: timestamp("expires_at").notNull(),
+  createdAt: timestamp("created_at"),
+  updatedAt: timestamp("updated_at"),
+});
 
 // Exercises table
 export const exercises = pgTable(
@@ -116,9 +158,9 @@ export const userWorkoutPlans = pgTable(
   "user_workout_plans",
   {
     id: serial("id").primaryKey(),
-    userId: integer("user_id")
+    userId: text("user_id")
       .notNull()
-      .references(() => users.id),
+      .references(() => user.id),
     workoutPlanId: integer("workout_plan_id")
       .notNull()
       .references(() => workoutPlans.id),
@@ -141,9 +183,9 @@ export const userWorkouts = pgTable(
   "user_workouts",
   {
     id: serial("id").primaryKey(),
-    userId: integer("user_id")
+    userId: text("user_id")
       .notNull()
-      .references(() => users.id),
+      .references(() => user.id),
     userWorkoutPlanId: integer("user_workout_plan_id")
       .notNull()
       .references(() => userWorkoutPlans.id),
@@ -209,7 +251,7 @@ export const userWorkoutSets = pgTable(
   ]
 );
 
-export const usersRelations = relations(users, (rel) => ({
+export const usersRelations = relations(user, (rel) => ({
   userWorkoutPlans: rel.many(userWorkoutPlans),
   userWorkouts: rel.many(userWorkouts),
 }));
@@ -262,9 +304,9 @@ export const workoutPlanExerciseSetsRelations = relations(
 );
 
 export const userWorkoutPlansRelations = relations(userWorkoutPlans, (rel) => ({
-  user: rel.one(users, {
+  user: rel.one(user, {
     fields: [userWorkoutPlans.userId],
-    references: [users.id],
+    references: [user.id],
   }),
   workoutPlan: rel.one(workoutPlans, {
     fields: [userWorkoutPlans.workoutPlanId],
@@ -274,9 +316,9 @@ export const userWorkoutPlansRelations = relations(userWorkoutPlans, (rel) => ({
 }));
 
 export const userWorkoutsRelations = relations(userWorkouts, (rel) => ({
-  user: rel.one(users, {
+  user: rel.one(user, {
     fields: [userWorkouts.userId],
-    references: [users.id],
+    references: [user.id],
   }),
   userWorkoutPlan: rel.one(userWorkoutPlans, {
     fields: [userWorkouts.userWorkoutPlanId],

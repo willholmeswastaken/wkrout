@@ -9,7 +9,7 @@ export default async function PlansPage() {
   return (
     <div className="space-y-8">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
-        <h2 className="text-2xl font-bold">My Plans</h2>
+        <h2 className="text-2xl font-bold">Available Plans</h2>
         <Link href="/plans/create">
           <Button className="bg-orange-500 hover:bg-orange-600">
             <Plus className="h-5 w-5 mr-2" />
