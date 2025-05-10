@@ -21,14 +21,10 @@ import {
 } from "@/components/ui/dialog";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import Link from "next/link";
-import {
-  Play,
-  Calendar,
-  ChevronRight,
-  CheckCircle,
-  RotateCcw,
-  AlertTriangle,
-} from "lucide-react";
+import { Play, Calendar, CheckCircle, RotateCcw, X } from "lucide-react";
+import { api } from "@/trpc/react";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 type UserWorkoutPlan = {
   id: number;
@@ -48,8 +44,20 @@ interface CurrentPlanOverviewProps {
 }
 
 export function CurrentPlanOverview({ plan }: CurrentPlanOverviewProps) {
+  const router = useRouter();
   const [showResetDialog, setShowResetDialog] = useState(false);
+  const [showAbandonDialog, setShowAbandonDialog] = useState(false);
   const [resetSuccess, setResetSuccess] = useState(false);
+
+  const abandonPlan = api.user.abandonWorkoutPlan.useMutation({
+    onSuccess: () => {
+      toast.success("Plan abandoned successfully");
+      router.refresh();
+    },
+    onError: () => {
+      toast.error("Failed to abandon plan");
+    },
+  });
 
   const planName = plan.customName || plan.workoutPlan.name;
   const totalWorkouts = plan.daysPerWeek;
@@ -67,6 +75,11 @@ export function CurrentPlanOverview({ plan }: CurrentPlanOverviewProps) {
     setTimeout(() => {
       setResetSuccess(false);
     }, 3000);
+  };
+
+  const handleAbandon = () => {
+    abandonPlan.mutate({ userWorkoutPlanId: plan.id });
+    setShowAbandonDialog(false);
   };
 
   return (
@@ -93,6 +106,15 @@ export function CurrentPlanOverview({ plan }: CurrentPlanOverviewProps) {
                 title="Reset weekly progress"
               >
                 <RotateCcw className="h-4 w-4" />
+              </Button>
+              <Button
+                variant="outline"
+                size="icon"
+                className="h-8 w-8 text-red-500 hover:text-red-600 hover:border-red-500/20"
+                onClick={() => setShowAbandonDialog(true)}
+                title="Abandon plan"
+              >
+                <X className="h-4 w-4" />
               </Button>
             </div>
           </div>
@@ -177,6 +199,34 @@ export function CurrentPlanOverview({ plan }: CurrentPlanOverviewProps) {
             </Button>
             <Button variant="destructive" onClick={handleReset}>
               Reset Progress
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Abandon Plan Dialog */}
+      <Dialog open={showAbandonDialog} onOpenChange={setShowAbandonDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Abandon Current Plan</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to abandon this plan? This action cannot be
+              undone. You will lose all progress associated with this plan.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setShowAbandonDialog(false)}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={handleAbandon}
+              disabled={abandonPlan.isPending}
+            >
+              {abandonPlan.isPending ? "Abandoning..." : "Abandon Plan"}
             </Button>
           </DialogFooter>
         </DialogContent>

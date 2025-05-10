@@ -1,227 +1,174 @@
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import Link from "next/link";
 import {
   Dumbbell,
-  Plus,
-  Calendar,
-  BarChart3,
-  Settings,
-  Flame,
+  ArrowRight,
   CheckCircle,
+  Sparkles,
+  Trophy,
+  Users,
 } from "lucide-react";
-import { CurrentPlanOverview } from "@/components/current-plan-overview";
-import { api } from "@/trpc/server";
 
-export default async function Home() {
-  // Fetch user's current plan
-  const userPlans = await api.user.getUserWorkoutPlans();
-  const hasActivePlan = userPlans.length > 0;
-
-  // Mock data for weekly streak
-  const weeklyStreak = {
-    current: 8, // Current streak in weeks
-    best: 12, // Best streak ever achieved
-    weeks: [
-      // Last 10 weeks, true = at least one workout logged that week
-      { active: true, date: "Apr 19-25" },
-      { active: true, date: "Apr 12-18" },
-      { active: true, date: "Apr 5-11" },
-      { active: true, date: "Mar 29-Apr 4" },
-      { active: true, date: "Mar 22-28" },
-      { active: true, date: "Mar 15-21" },
-      { active: true, date: "Mar 8-14" },
-      { active: true, date: "Mar 1-7" },
-      { active: false, date: "Feb 23-29" },
-      { active: false, date: "Feb 16-22" },
-    ],
-  };
-
+export default function LandingPage() {
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-      {/* Current Plan Overview - Takes 2/3 of the screen on desktop */}
-      <div className="lg:col-span-2">
-        {hasActivePlan ? (
-          <CurrentPlanOverview plan={userPlans[0]} />
-        ) : (
-          <div className="space-y-6">
-            <div>
-              <div className="flex items-center gap-2 mb-6">
-                <div>
-                  <h2 className="text-2xl font-bold">No Active Plan</h2>
-                  <p className="text-muted-foreground">
-                    Start your fitness journey today
-                  </p>
-                </div>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <Card className="bg-orange-500/5 border-orange-500/20">
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-base">
-                      Predefined Plans
-                    </CardTitle>
-                    <CardDescription>
-                      Choose from our curated workout plans
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <Link href="/plans">
-                      <Button className="w-full bg-orange-500 hover:bg-orange-600">
-                        <Calendar className="mr-2 h-4 w-4" />
-                        Browse Plans
-                      </Button>
-                    </Link>
-                  </CardContent>
-                </Card>
-
-                <Card className="bg-secondary/50">
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-base">Custom Plan</CardTitle>
-                    <CardDescription>
-                      Create your own workout routine
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <Link href="/plans/create">
-                      <Button
-                        variant="outline"
-                        className="w-full border-orange-500/20 hover:bg-orange-500/10 hover:text-orange-500"
-                      >
-                        <Plus className="mr-2 h-4 w-4" />
-                        Create Custom
-                      </Button>
-                    </Link>
-                  </CardContent>
-                </Card>
-              </div>
-            </div>
-
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-base">
-                  Why Choose a Predefined Plan?
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <ul className="space-y-2 text-sm text-muted-foreground">
-                  <li className="flex items-center gap-2">
-                    <CheckCircle className="h-4 w-4 text-orange-500" />
-                    Expert-designed workout routines
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <CheckCircle className="h-4 w-4 text-orange-500" />
-                    Progressive difficulty levels
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <CheckCircle className="h-4 w-4 text-orange-500" />
-                    Balanced exercise selection
-                  </li>
-                </ul>
-              </CardContent>
-            </Card>
-          </div>
-        )}
-      </div>
-
-      {/* Quick Actions - Takes 1/3 of the screen on desktop */}
-      <div className="space-y-4">
-        <h2 className="text-lg font-semibold">Quick Actions</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-4">
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-base">My Plans</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <Link href="/plans">
-                <Button
-                  variant="outline"
-                  className="w-full border-orange-500/20 hover:bg-orange-500/10 hover:text-orange-500"
-                >
-                  <Calendar className="mr-2 h-4 w-4 text-orange-500" />
-                  View Plans
-                </Button>
-              </Link>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-base">Progress</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <Link href="/progress">
-                <Button
-                  variant="outline"
-                  className="w-full border-orange-500/20 hover:bg-orange-500/10 hover:text-orange-500"
-                >
-                  <BarChart3 className="mr-2 h-4 w-4 text-orange-500" />
-                  Analytics
-                </Button>
-              </Link>
-            </CardContent>
-          </Card>
+    <div className="min-h-screen bg-gradient-to-b from-background to-secondary/0 overflow-x-clip">
+      {/* Hero Section */}
+      <div className="relative overflow-hidden">
+        {/* Full-width Hero Gradient, only in hero section */}
+        <div className="absolute left-0 top-0 w-full h-full -z-10 pointer-events-none">
+          <div className="w-full h-full bg-gradient-to-tr from-orange-500 to-orange-600 opacity-20 blur-3xl" />
         </div>
-
-        <Card>
-          <CardHeader className="pb-2">
-            <div className="flex justify-between items-center">
-              <CardTitle className="text-base">Weekly Streak</CardTitle>
-              <div className="flex items-center">
-                <Flame className="h-4 w-4 text-orange-500 mr-1" />
-                <span className="text-lg font-bold text-orange-500">
-                  {weeklyStreak.current}
-                </span>
+        <div className="mx-auto max-w-7xl px-6 pt-8 lg:px-8">
+          <div className="mx-auto max-w-2xl py-16 sm:py-24 lg:py-32">
+            <div className="text-center">
+              <div className="inline-flex items-center rounded-full px-4 py-1 text-sm font-medium bg-orange-500/10 text-orange-500 ring-1 ring-inset ring-orange-500/20 mb-8">
+                <Sparkles className="h-4 w-4 mr-2" />
+                Transform Your Fitness Journey
               </div>
-            </div>
-            <CardDescription>Consecutive weeks with workouts</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              {/* Streak visualization */}
-              <div className="flex gap-1">
-                {weeklyStreak.weeks.map((week, index) => (
-                  <div
-                    key={index}
-                    className={`h-2 flex-1 rounded-full ${
-                      week.active ? "bg-orange-500" : "bg-gray-700"
-                    }`}
-                    title={week.date}
-                  />
-                ))}
-              </div>
-
-              <div className="flex justify-between text-xs text-muted-foreground">
-                <span>10 weeks ago</span>
-                <span>Current</span>
-              </div>
-
-              <div className="pt-2 flex justify-between items-center">
-                <div>
-                  <div className="text-xs text-muted-foreground">
-                    Best streak
-                  </div>
-                  <div className="font-semibold">{weeklyStreak.best} weeks</div>
-                </div>
-
-                <Link href="/plans/create">
+              <h1 className="text-4xl font-bold tracking-tight sm:text-6xl bg-clip-text text-transparent bg-gradient-to-r from-orange-500 to-orange-600">
+                Your Personal Fitness
+                <br />
+                Success Story
+              </h1>
+              <p className="mt-6 md:text-lg leading-8 text-muted-foreground">
+                Track your workouts, follow expert-designed plans, and achieve
+                your fitness goals with our comprehensive workout tracking
+                platform.
+              </p>
+              <div className="mt-10 flex items-center justify-center gap-x-6">
+                <Link href="/app">
                   <Button
-                    size="sm"
-                    className="bg-orange-500 hover:bg-orange-600"
+                    size="lg"
+                    className="bg-orange-500 hover:bg-orange-600 shadow-lg shadow-orange-500/25"
                   >
-                    <Plus className="h-4 w-4 mr-1" />
-                    New Plan
+                    Get Started
+                    <ArrowRight className="ml-2 h-4 w-4" />
                   </Button>
                 </Link>
               </div>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
+      </div>
+
+      {/* Stats Section */}
+      <div className="mx-auto max-w-7xl px-6 lg:px-8">
+        <div className="mx-auto max-w-2xl lg:max-w-none">
+          <div className="grid grid-cols-1 gap-y-8 gap-x-6 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="flex flex-col items-center text-center p-8 rounded-2xl bg-orange-500/5 border border-orange-500/10">
+              <Trophy className="h-8 w-8 text-orange-500 mb-4" />
+              <div className="text-3xl font-bold text-orange-500">10k+</div>
+              <div className="text-sm text-muted-foreground mt-1">
+                Workouts Completed
+              </div>
+            </div>
+            <div className="flex flex-col items-center text-center p-8 rounded-2xl bg-orange-500/5 border border-orange-500/10">
+              <Users className="h-8 w-8 text-orange-500 mb-4" />
+              <div className="text-3xl font-bold text-orange-500">5k+</div>
+              <div className="text-sm text-muted-foreground mt-1">
+                Active Users
+              </div>
+            </div>
+            <div className="flex flex-col items-center text-center p-8 rounded-2xl bg-orange-500/5 border border-orange-500/10">
+              <Dumbbell className="h-8 w-8 text-orange-500 mb-4" />
+              <div className="text-3xl font-bold text-orange-500">100+</div>
+              <div className="text-sm text-muted-foreground mt-1">
+                Workout Plans
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Features Section */}
+      <div className="py-24 sm:py-32">
+        <div className="mx-auto max-w-7xl px-6 lg:px-8">
+          <div className="mx-auto max-w-2xl lg:text-center">
+            <div className="inline-flex items-center rounded-full px-4 py-1 text-sm font-medium bg-orange-500/10 text-orange-500 ring-1 ring-inset ring-orange-500/20 mb-8">
+              <Sparkles className="h-4 w-4 mr-2" />
+              Everything you need
+            </div>
+            <h2 className="text-3xl font-bold tracking-tight sm:text-4xl bg-clip-text text-transparent bg-gradient-to-r from-orange-500 to-orange-600">
+              Features that help you succeed
+            </h2>
+            <p className="mt-6 text-lg leading-8 text-muted-foreground">
+              Our platform provides all the tools you need to track, plan, and
+              achieve your fitness goals.
+            </p>
+          </div>
+          <div className="mx-auto mt-16 max-w-2xl sm:mt-20 lg:mt-24 lg:max-w-none">
+            <dl className="grid max-w-xl grid-cols-1 gap-x-8 gap-y-16 lg:max-w-none lg:grid-cols-3">
+              <div className="flex flex-col p-8 rounded-2xl bg-orange-500/5 border border-orange-500/10">
+                <dt className="flex items-center gap-x-3 text-base font-semibold leading-7">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-orange-500/10">
+                    <Dumbbell className="h-6 w-6 text-orange-500" />
+                  </div>
+                  Expert Workout Plans
+                </dt>
+                <dd className="mt-4 flex flex-auto flex-col text-base leading-7 text-muted-foreground">
+                  <p className="flex-auto">
+                    Access professionally designed workout plans tailored to
+                    your goals and fitness level.
+                  </p>
+                </dd>
+              </div>
+              <div className="flex flex-col p-8 rounded-2xl bg-orange-500/5 border border-orange-500/10">
+                <dt className="flex items-center gap-x-3 text-base font-semibold leading-7">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-orange-500/10">
+                    <CheckCircle className="h-6 w-6 text-orange-500" />
+                  </div>
+                  Progress Tracking
+                </dt>
+                <dd className="mt-4 flex flex-auto flex-col text-base leading-7 text-muted-foreground">
+                  <p className="flex-auto">
+                    Monitor your progress with detailed analytics and streak
+                    tracking to stay motivated.
+                  </p>
+                </dd>
+              </div>
+              <div className="flex flex-col p-8 rounded-2xl bg-orange-500/5 border border-orange-500/10">
+                <dt className="flex items-center gap-x-3 text-base font-semibold leading-7">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-orange-500/10">
+                    <ArrowRight className="h-6 w-6 text-orange-500" />
+                  </div>
+                  Custom Workouts
+                </dt>
+                <dd className="mt-4 flex flex-auto flex-col text-base leading-7 text-muted-foreground">
+                  <p className="flex-auto">
+                    Create and customize your own workout routines to match your
+                    specific needs.
+                  </p>
+                </dd>
+              </div>
+            </dl>
+          </div>
+        </div>
+      </div>
+
+      {/* CTA Section */}
+      <div className="relative isolate">
+        <div className="mx-auto max-w-7xl px-6 py-24 sm:py-32 lg:px-8">
+          <div className="relative isolate overflow-hidden px-6 py-24 text-center shadow-2xl sm:rounded-3xl sm:px-16 bg-orange-500/5 border border-orange-500/10">
+            <h2 className="mx-auto max-w-2xl text-3xl font-bold tracking-tight sm:text-4xl bg-clip-text text-transparent bg-gradient-to-r from-orange-500 to-orange-600">
+              Ready to start your fitness journey?
+            </h2>
+            <p className="mx-auto mt-6 max-w-xl text-lg leading-8 text-muted-foreground">
+              Join thousands of users who have transformed their fitness with
+              our platform.
+            </p>
+            <div className="mt-10 flex items-center justify-center gap-x-6">
+              <Link href="/app">
+                <Button
+                  size="lg"
+                  className="bg-orange-500 hover:bg-orange-600 shadow-lg shadow-orange-500/25"
+                >
+                  Get Started
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
+              </Link>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

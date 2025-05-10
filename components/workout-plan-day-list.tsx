@@ -10,6 +10,11 @@ import {
 } from "@/components/ui/dialog";
 import { useState } from "react";
 
+interface WorkoutSet {
+  reps: number;
+  weight?: number;
+}
+
 interface WorkoutPlanDayListProps {
   days: WorkoutPlanDay[];
   onSelectDay?: (dayId: string | number) => void;
@@ -86,7 +91,7 @@ export function WorkoutPlanDayList({
                   </div>
                   {ex.sets && ex.sets.length > 0 ? (
                     <ul className="text-sm text-gray-300 pl-4 list-disc">
-                      {ex.sets.map((set: any, idx: number) => (
+                      {ex.sets.map((set: WorkoutSet, idx: number) => (
                         <li key={idx}>
                           Set {idx + 1}: {set.reps} reps
                           {set.weight ? ` @ ${set.weight}kg` : ""}

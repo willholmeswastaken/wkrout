@@ -8,11 +8,30 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { WorkoutPlanDayList } from "@/components/workout-plan-day-list";
 import { WorkoutPlansResponse } from "@/types/plans";
+import { api } from "@/trpc/react";
+import { toast } from "sonner";
 
 export function WorkoutPlansList({ plans }: { plans: WorkoutPlansResponse }) {
+  const router = useRouter();
+  const saveWorkoutPlan = api.user.saveWorkoutPlan.useMutation({
+    onSuccess: () => {
+      router.push("/app");
+    },
+    onError: () => {
+      toast.error("Failed to save workout plan");
+    },
+  });
+
+  const handleStartPlan = async (planId: number, daysPerWeek: number) => {
+    saveWorkoutPlan.mutate({
+      workoutPlanId: planId,
+      daysPerWeek,
+    });
+  };
+
   return (
     <>
       {plans.map((plan) => (
@@ -28,9 +47,12 @@ export function WorkoutPlansList({ plans }: { plans: WorkoutPlansResponse }) {
             </div>
           </CardContent>
           <CardFooter className="flex justify-end pt-2">
-            <Link href={`/plans/start/${plan.id}`}>
-              <Button>Start Plan</Button>
-            </Link>
+            <Button
+              onClick={() => handleStartPlan(plan.id, plan.days)}
+              disabled={saveWorkoutPlan.isPending}
+            >
+              {saveWorkoutPlan.isPending ? "Starting..." : "Start Plan"}
+            </Button>
           </CardFooter>
         </Card>
       ))}
